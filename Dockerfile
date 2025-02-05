@@ -16,31 +16,42 @@ WORKDIR /app
 RUN git clone https://github.com/Pelochus/ezrknn-llm.git && \
     cd ezrknn-llm && bash install.sh
 
-# Copy the Python script instead of compiling it
+# Copy application files
 COPY app.py /app/
+COPY requirements.txt /app/
+
+# Install Python dependencies
+RUN pip3 install --no-cache-dir -r /app/requirements.txt
 
 # Stage 2: Runtime stage
-# Use the official Python base image
-FROM python:3.11-slim
+FROM arm64v8/debian:bullseye-slim
 
-# Set working directory
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3 libstdc++6 wget && \
+    rm -rf /var/lib/apt/lists/*
+
+# Copy artifacts from builder stage
 WORKDIR /app
+COPY --from=builder /app/app.py /app/app.py
+COPY --from=builder /app/requirements.txt /app/requirements.txt
 
-# Copy application files
-COPY app.py /app/app.py
+# Install Python dependencies in runtime stage
+RUN pip3 install --no-cache-dir -r /app/requirements.txt
+
+# Copy additional required files (e.g., models, entrypoint script)
 COPY models/ /app/models/
 COPY entrypoint.sh /usr/bin/entrypoint.sh
-
-# Install required libraries (if any)
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    libstdc++6 wget && \
-    rm -rf /var/lib/apt/lists/*
 
 # Make entrypoint script executable
 RUN chmod +x /usr/bin/entrypoint.sh
 
-# Expose necessary ports
+# Copy librknnrt.so for NPU support
+COPY librknnrt.so /usr/lib/librknnrt.so
+RUN chmod +x /usr/lib/librknnrt.so
+
+# Expose necessary ports (e.g., Flask app port)
 EXPOSE 8083
 
-# Set entrypoint
+# Use entrypoint script for runtime configuration and execution
 ENTRYPOINT ["/usr/bin/entrypoint.sh"]
