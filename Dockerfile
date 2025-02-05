@@ -48,6 +48,13 @@ RUN chmod +x /usr/bin/entrypoint.sh
 COPY librknnrt.so /usr/lib/librknnrt.so
 RUN chmod +x /usr/lib/librknnrt.so
 
+# Copy librkllmrt.so for NPU support
+COPY librkllmrt.so /usr/lib/librkllmrt.so
+RUN chmod +x /usr/lib/librkllmrt.so
+
+# Copy the 'include' folder into /usr/local/include in the container
+COPY include/ /usr/local/include/
+
 # Expose necessary ports (e.g., Flask app port)
 EXPOSE 8083
 
