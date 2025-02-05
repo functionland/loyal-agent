@@ -16,10 +16,8 @@ WORKDIR /app
 RUN git clone https://github.com/Pelochus/ezrknn-llm.git && \
     cd ezrknn-llm && bash install.sh
 
-# Install PyInstaller and create executable
-RUN pip3 install pyinstaller
+# Copy the Python script instead of compiling it
 COPY app.py /app/
-RUN pyinstaller --onefile --name rkllm_server /app/app.py
 
 # Stage 2: Runtime stage
 FROM arm64v8/debian:bullseye-slim
@@ -31,7 +29,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Copy artifacts from builder stage
 WORKDIR /app
-COPY --from=builder /app/dist/rkllm_server /usr/bin/rkllm_server
+COPY --from=builder /app/app.py /app/app.py
 
 # Copy additional required files (e.g., models, entrypoint script)
 COPY models/ /app/models/
