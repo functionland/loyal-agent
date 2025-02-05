@@ -4,11 +4,9 @@ FROM arm64v8/debian:bullseye-slim AS builder
 # Set non-interactive mode to avoid prompts during installation
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install dependencies with workarounds for libc-bin issues
+# Install Python and pip
 RUN apt-get update && apt-get install -y \
-    build-essential cmake git python3 python3-pip wget || true && \
-    dpkg --configure -a && \
-    apt-get install -f -y && \
+    build-essential cmake git python3 python3-pip wget && \
     rm -rf /var/lib/apt/lists/*
 
 # Clone repository and run install script
@@ -26,9 +24,9 @@ RUN pip3 install --no-cache-dir -r /app/requirements.txt
 # Stage 2: Runtime stage
 FROM arm64v8/debian:bullseye-slim
 
-# Install runtime dependencies
+# Install Python and pip
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3 libstdc++6 wget && \
+    python3 python3-pip libstdc++6 wget && \
     rm -rf /var/lib/apt/lists/*
 
 # Copy artifacts from builder stage
