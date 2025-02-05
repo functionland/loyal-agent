@@ -22,7 +22,7 @@ COPY app.py /app/
 RUN pyinstaller --onefile --name rkllm_server /app/app.py
 
 # Stage 2: Runtime stage
-FROM arm64v8/alpine:latest
+FROM arm64v8/debian:bullseye-slim
 
 # Install runtime dependencies
 RUN apk add --no-cache python3 bash libstdc++ libc6-compat wget
@@ -38,9 +38,9 @@ COPY entrypoint.sh /usr/bin/entrypoint.sh
 # Make entrypoint script executable
 RUN chmod +x /usr/bin/entrypoint.sh
 
-# Download librknnrt.so for NPU support with retry logic
-RUN wget --tries=3 --retry-connrefused -q https://github.com/rockchip-linux/rknpu2/raw/master/runtime/RK3588/Linux/librknn_api/aarch64/librknnrt.so -O /usr/lib/librknnrt.so && \
-    chmod +x /usr/lib/librknnrt.so
+# Copy librknnrt.so for NPU support
+COPY librknnrt.so /usr/lib/librknnrt.so
+RUN chmod +x /usr/lib/librknnrt.so
 
 # Expose necessary ports (e.g., Flask app port)
 EXPOSE 8083
