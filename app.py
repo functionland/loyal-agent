@@ -15,7 +15,7 @@ PROMPT_TEXT_PREFIX = "<|im_start|>system You are a helpful assistant. <|im_end|>
 PROMPT_TEXT_POSTFIX = "<|im_end|><|im_start|>assistant"
 
 # Set the dynamic library path
-rkllm_lib = ctypes.CDLL('lib/librkllmrt.so')
+rkllm_lib = ctypes.CDLL('/lib/librkllmrt.so')
 
 # Define the structures from the library
 RKLLM_Handle_t = ctypes.c_void_p
