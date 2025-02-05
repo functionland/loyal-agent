@@ -25,7 +25,9 @@ RUN pyinstaller --onefile --name rkllm_server /app/app.py
 FROM arm64v8/debian:bullseye-slim
 
 # Install runtime dependencies
-RUN apk add --no-cache python3 bash libstdc++ libc6-compat wget
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    python3 libstdc++6 wget && \
+    rm -rf /var/lib/apt/lists/*
 
 # Copy artifacts from builder stage
 WORKDIR /app
