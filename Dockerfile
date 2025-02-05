@@ -4,9 +4,9 @@ FROM arm64v8/debian:bullseye-slim AS builder
 # Set non-interactive mode to avoid prompts during installation
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install Python and pip
+# Install Python, pip, and required libraries (including libgomp1)
 RUN apt-get update && apt-get install -y \
-    build-essential cmake git python3 python3-pip wget && \
+    build-essential cmake git python3 python3-pip wget libgomp1 && \
     rm -rf /var/lib/apt/lists/*
 
 # Clone repository and run install script
@@ -24,9 +24,12 @@ RUN pip3 install --no-cache-dir -r /app/requirements.txt
 # Stage 2: Runtime stage
 FROM arm64v8/debian:bullseye-slim
 
-# Install Python and pip
+# Set non-interactive mode to avoid prompts during installation
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install Python, pip, and required libraries (including libgomp1)
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    python3 python3-pip libstdc++6 wget && \
+    python3 python3-pip libstdc++6 wget libgomp1 && \
     rm -rf /var/lib/apt/lists/*
 
 # Copy artifacts from builder stage
@@ -49,8 +52,8 @@ COPY librknnrt.so /usr/lib/librknnrt.so
 RUN chmod +x /usr/lib/librknnrt.so
 
 # Copy librkllmrt.so for NPU support
-COPY librkllmrt.so /lib/librkllmrt.so
-RUN chmod +x /lib/librkllmrt.so
+COPY librknnrt.so /usr/lib/librkllmrt.so
+RUN chmod +x /usr/lib/librkllmrt.so
 
 # Copy the 'include' folder into /usr/local/include in the container
 COPY include/ /usr/local/include/
