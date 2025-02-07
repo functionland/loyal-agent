@@ -1,5 +1,5 @@
 # Stage 1: Build stage
-FROM arm64v8/debian:bullseye-slim AS builder
+FROM --platform=linux/arm64 debian:bullseye-slim AS builder
 
 # Set non-interactive mode to avoid prompts during installation
 ENV DEBIAN_FRONTEND=noninteractive
@@ -25,7 +25,7 @@ COPY requirements.txt /app/
 RUN pip3 install --no-cache-dir -r /app/requirements.txt
 
 # Stage 2: Runtime stage
-FROM arm64v8/debian:bullseye-slim
+FROM --platform=linux/arm64 debian:bullseye-slim
 
 # Set non-interactive mode to avoid prompts during installation
 ENV DEBIAN_FRONTEND=noninteractive
