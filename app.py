@@ -322,7 +322,7 @@ if __name__ == "__main__":
             exit()
 
     # Fix frequency
-    command = "sudo bash fix_freq_{}.sh".format(args.target_platform)
+    command = "bash fix_freq_{}.sh".format(args.target_platform)
     subprocess.run(command, shell=True)
 
     # Set resource limit
