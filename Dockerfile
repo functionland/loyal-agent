@@ -14,6 +14,9 @@ WORKDIR /app
 RUN git clone https://github.com/Pelochus/ezrknn-llm.git && \
     cd ezrknn-llm && bash install.sh
 
+# Copy the fix_freq_rk3588.sh script from the cloned repository to /app
+RUN cp ezrknn-llm/scripts/fix_freq_rk3588.sh /app/
+
 # Copy application files
 COPY app.py /app/
 COPY requirements.txt /app/
@@ -36,6 +39,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 WORKDIR /app
 COPY --from=builder /app/app.py /app/app.py
 COPY --from=builder /app/requirements.txt /app/requirements.txt
+COPY --from=builder /app/fix_freq_rk3588.sh /app/fix_freq_rk3588.sh
 
 # Install Python dependencies in runtime stage
 RUN pip3 install --no-cache-dir -r /app/requirements.txt
